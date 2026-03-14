@@ -117,11 +117,11 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 /* COVER PAGE */
 .cover-hero{background:var(--dark);height:380px;position:relative;overflow:hidden;display:flex;align-items:center;}
 .cover-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.28;}
-.cover-hero-overlay{position:relative;z-index:2;padding:36px 36px 0;width:100%;}
+
 .cover-hero-logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;}
 .cover-hero-logo{width:300px;max-width:55%;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.7));}
-.cover-hero-proj{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:3px;text-shadow:0 2px 12px rgba(0,0,0,0.7);text-align:center;border-top:3px solid var(--red);padding-top:12px;padding-left:30px;padding-right:30px;}
-.cover-project-name{font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:2px;line-height:1;border-bottom:4px solid var(--red);display:inline-block;padding-bottom:5px;}
+.cover-hero-proj{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:3px;text-shadow:0 2px 12px rgba(0,0,0,0.7);text-align:center;padding-top:12px;padding-left:30px;padding-right:30px;}
+
 .cover-body{display:grid;grid-template-columns:1fr 240px;min-height:340px;}
 .cover-meta{padding:28px 24px 28px 36px;border-right:1px solid #e0e0e0;}
 .cover-meta-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:16px;border-bottom:1px solid #eee;padding-bottom:8px;}
@@ -146,22 +146,6 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .toc-deco-tl{position:absolute;top:0;left:0;width:18px;height:100%;background:var(--gray);}
 .toc-deco-tr{position:absolute;top:40px;right:30px;width:120px;height:120px;background:var(--red);clip-path:polygon(100% 0,0 0,100% 100%);filter:drop-shadow(4px 4px 6px rgba(0,0,0,.35));}
 .toc-deco-br{position:absolute;bottom:30px;right:30px;width:100px;height:100px;background:var(--blue);clip-path:polygon(100% 0,0 100%,100% 100%);filter:drop-shadow(4px 4px 6px rgba(0,0,0,.35));}
-
-/* ABOUT US */
-.about-content{padding:28px 36px 60px;}
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:28px;}
-.about-text p{font-size:13px;line-height:1.7;color:#444;margin-bottom:12px;}
-.about-photo{border-radius:4px;overflow:hidden;}
-.about-photo img{width:100%;height:100%;object-fit:cover;}
-.about-divider{height:4px;background:linear-gradient(to right,var(--blue),var(--red));margin-bottom:24px;}
-.about-bottom{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
-.about-bottom-photo{border-radius:4px;overflow:hidden;height:200px;}
-.about-bottom-photo img{width:100%;height:100%;object-fit:cover;}
-.free-services h3{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;text-transform:uppercase;margin-bottom:14px;}
-.free-services ul{list-style:none;}
-.free-services li{padding:7px 0 7px 18px;position:relative;font-size:14px;border-bottom:1px solid #eee;}
-.free-services li:last-child{border-bottom:none;}
-.free-services li::before{content:'•';position:absolute;left:0;color:var(--blue);font-size:18px;top:5px;}
 
 /* PHOTOS PAGE */
 .photos-content{padding:28px 36px 60px;}
@@ -243,7 +227,6 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 /* SECTION TITLE */
 .section-title{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;border-left:6px solid var(--red);padding-left:14px;}
 
-
 /* RECENTLY COMPLETED PAGE */
 .rc-content{padding:28px 36px 60px;}
 .rc-intro{font-size:12.5px;color:#555;line-height:1.65;margin-bottom:24px;border-left:4px solid var(--blue);padding-left:12px;}
@@ -279,7 +262,6 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .add-rcp-btn{display:flex;align-items:center;justify-content:center;gap:7px;border:2px dashed #ccc;border-radius:5px;padding:10px;cursor:pointer;color:var(--mid);font-size:12px;font-weight:600;background:none;width:100%;margin-top:7px;}
 .add-rcp-btn:hover{border-color:var(--blue);color:var(--blue);background:#eef2ff;}
 
-
 /* PAGE VISIBILITY TOGGLES */
 .page-setup-section{padding:10px 14px;background:#f8f8f8;border-bottom:1px solid #eee;}
 .page-setup-title{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
@@ -296,52 +278,9 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 
 /* Hidden pages don't show in preview or print */
 .page.page-hidden{display:none!important;}
-
-
-/* WHY AES PAGE — spacing base */
-.about-content{padding:18px 36px 32px;}
-
-/* RC FORM */
-.rcp-list{display:flex;flex-direction:column;gap:7px;}
-.rcp{border:1px solid #ddd;border-radius:5px;overflow:hidden;}
-.rcp-hdr{display:flex;align-items:center;gap:9px;padding:9px 11px;background:#fafafa;cursor:pointer;}
-.rcp-hdr:hover{background:#f0f4ff;}
-.rcp-name{font-weight:600;font-size:12px;flex:1;}
-.rcp-btns{display:flex;gap:4px;margin-left:auto;}
-.rcp-edit{background:none;border:none;font-size:13px;cursor:pointer;color:#aaa;padding:2px 4px;}
-.rcp-edit:hover{color:var(--blue);}
-.rcp-del{background:none;border:none;font-size:17px;cursor:pointer;color:#ddd;padding:1px 4px;}
-.rcp-del:hover{color:var(--red);}
-.rcp-body{padding:11px;border-top:1px solid #eee;display:none;}
-.rcp-body.open{display:block;}
-.rcp-img-zone{border:2px dashed #ccc;border-radius:3px;padding:8px;text-align:center;cursor:pointer;background:#fafafa;font-size:11px;color:var(--mid);margin-top:8px;}
-.rcp-img-zone:hover{border-color:var(--blue);background:#eef2ff;}
-.rcp-thumb{position:relative;margin-top:6px;}
-.rcp-thumb img{width:100%;height:80px;object-fit:cover;border-radius:3px;}
-.rcp-thumb button{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:15px;height:15px;font-size:9px;cursor:pointer;}
-.add-rcp-btn{display:flex;align-items:center;justify-content:center;gap:7px;border:2px dashed #ccc;border-radius:5px;padding:10px;cursor:pointer;color:var(--mid);font-size:12px;font-weight:600;background:none;width:100%;margin-top:7px;}
-.add-rcp-btn:hover{border-color:var(--blue);color:var(--blue);background:#eef2ff;}
-
-
-/* PAGE VISIBILITY TOGGLES */
-.page-setup-section{padding:10px 14px;background:#f8f8f8;border-bottom:1px solid #eee;}
-.page-setup-title{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
-.pv-list{display:flex;flex-direction:column;gap:5px;}
-.pv-row{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:#fff;border:1px solid #eee;border-radius:4px;}
-.pv-row.off{background:#fafafa;opacity:.6;}
-.pv-label{font-size:11px;font-weight:600;color:var(--dark);}
-.pv-switch{position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0;}
-.pv-switch input{opacity:0;width:0;height:0;}
-.pv-slider{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:18px;transition:.2s;}
-.pv-slider:before{position:absolute;content:"";height:12px;width:12px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
-.pv-switch input:checked + .pv-slider{background:var(--blue);}
-.pv-switch input:checked + .pv-slider:before{transform:translateX(16px);}
-
-/* Hidden pages don't show in preview or print */
-.page.page-hidden{display:none!important;}
-
 
 /* WHY AES PAGE */
+.about-content{padding:18px 36px 32px;}
 .why-tagline{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--blue);font-style:italic;margin-bottom:6px;letter-spacing:1px;}
 .why-intro{font-size:12.5px;line-height:1.65;color:#555;margin-bottom:14px;max-width:700px;}
 .why-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;}
@@ -665,7 +604,6 @@ Any additional work not explicitly listed above</textarea>
         <span>Exterior Envelope Inspections</span>
       </div>
     </div>
-  </div>
   </div>
   <div class="page-bot"></div>
 </div>
