@@ -1217,7 +1217,7 @@ function renderRCPList() {
         '</div>' +
         (p.photo ?
           '<div class="rcp-thumb"><img src="'+p.photo+'"><button onclick="rcpField('+p.id+',\'photo\',null);renderRCPList();up()">&#215;</button></div>' :
-          '<div class="rcp-img-zone" onclick="document.getElementById(\'rcp-file-\'+p.id+\'\').click()">&#128247; Upload project photo</div>' +
+          '<div class="rcp-img-zone" onclick="document.getElementById(\'rcp-file-'+p.id+'\').click()">&#128247; Upload project photo</div>' +
           '<input type="file" id="rcp-file-'+p.id+'" accept="image/*" style="display:none" onchange="handleRCPPhoto('+p.id+',this)">'
         ) +
       '</div>' +
