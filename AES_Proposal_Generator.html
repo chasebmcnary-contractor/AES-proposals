@@ -850,6 +850,7 @@ function addScope(data) {
     enabled: (data && data.enabled === false) ? false : true,
     notes: (data && data.notes) ? data.notes : '',
     images: (data && data.images) ? data.images : [],
+    showImg: (data && data.showImg === false) ? false : true,
     bullets: (data && data.bullets) ? data.bullets : ['']
   });
   renderScopeCards();
@@ -908,6 +909,10 @@ function removeScopeImg(scopeId, imgId) {
   var s = scopes.find(function(s) { return s.id === scopeId; });
   if(s) { s.images = s.images.filter(function(i) { return i.id !== imgId; }); renderScopeCards(); up(); }
 }
+function toggleScopeImg(id, checked) {
+  var s = scopes.find(function(s) { return s.id === id; });
+  if(s) { s.showImg = checked; renderScopeCards(); up(); }
+}
 
 function renderScopeCards() {
   document.getElementById('sc-list').innerHTML = scopes.map(function(s) {
@@ -941,9 +946,14 @@ function renderScopeCards() {
         '<div class="field" style="margin-top:10px;"><label>Additional Notes (optional)</label>' +
           '<textarea placeholder="Extra context..." oninput="setScopeNotes(' + s.id + ',this.value)">' + esc(s.notes) + '</textarea>' +
         '</div>' +
-        '<label style="display:block;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--mid);margin:10px 0 4px;">Bottom Images (up to 2)</label>' +
-        uploadBtn +
-        '<div class="img-thumbs">' + thumbs + '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 4px;">' +
+          '<label style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--mid);">Image on Page</label>' +
+          '<label class="pv-switch"><input type="checkbox" ' + (s.showImg ? 'checked' : '') + ' onchange="toggleScopeImg(' + s.id + ',this.checked)"><span class="pv-slider"></span></label>' +
+        '</div>' +
+        (s.showImg
+          ? uploadBtn + '<div class="img-thumbs">' + thumbs + '</div>'
+          : '<div style="font-size:11px;color:#bbb;text-align:center;padding:5px 0;border:1px dashed #eee;border-radius:3px;">Image hidden on this page</div>'
+        ) +
       '</div>' +
     '</div>';
   }).join('');
@@ -1045,12 +1055,14 @@ function renderScopePages() {
   document.getElementById('scope-pages').innerHTML = scopes.filter(function(s) { return s.enabled; }).map(function(s) {
     var bullets = s.bullets.filter(function(b) { return b.trim(); }).map(function(b) { return '<li>' + esc(b) + '</li>'; }).join('');
     var imgHtml = '';
-    if(s.images.length === 2) {
-      imgHtml = '<div class="scope-img-area two-imgs"><img src="' + s.images[0].src + '" alt=""><img src="' + s.images[1].src + '" alt=""></div>';
-    } else if(s.images.length === 1) {
-      imgHtml = '<div class="scope-img-area has-img"><img src="' + s.images[0].src + '" alt=""></div>';
-    } else {
-      imgHtml = '<div class="scope-img-area"><div class="scope-img-placeholder"><span style="font-size:28px">&#128247;</span><br>Upload up to 2 images for this scope in the form panel</div></div>';
+    if(s.showImg !== false) {
+      if(s.images.length === 2) {
+        imgHtml = '<div class="scope-img-area two-imgs"><img src="' + s.images[0].src + '" alt=""><img src="' + s.images[1].src + '" alt=""></div>';
+      } else if(s.images.length === 1) {
+        imgHtml = '<div class="scope-img-area has-img"><img src="' + s.images[0].src + '" alt=""></div>';
+      } else {
+        imgHtml = '<div class="scope-img-area"><div class="scope-img-placeholder"><span style="font-size:28px">&#128247;</span><br>Mock-Up Location (upload image)</div></div>';
+      }
     }
     return '<div class="page">' +
       '<div class="page-top"></div>' +
