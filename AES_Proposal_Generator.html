@@ -462,7 +462,7 @@ Any additional work not explicitly listed above</textarea>
     <div class="fs-hdr" onclick="tog(this)">&#9318; Signature Block <span>&#9662;</span></div>
     <div class="fs-body">
       <div class="field"><label>Name</label><input id="f-sname" type="text" value="Chase McNary" oninput="up()"></div>
-      <div class="field"><label>Title</label><input id="f-stitle" type="text" value="President" oninput="up()"></div>
+      <div class="field"><label>Title</label><input id="f-stitle" type="text" value="Founder/CEO" oninput="up()"></div>
       <div class="field"><label>Email</label><input id="f-semail" type="text" value="Chase@AmericanExteriorSystems.com" oninput="up()"></div>
       <div class="frow">
         <div class="field"><label>Direct</label><input id="f-sdirect" type="text" value="(303) 518-7997" oninput="up()"></div>
@@ -695,7 +695,7 @@ Any additional work not explicitly listed above</textarea>
         <div class="sig-spacer"></div>
         <div class="sig-line"></div>
         <div class="sig-name" id="p-sname">Chase McNary</div>
-        <div class="sig-sub" id="p-stitle">President</div>
+        <div class="sig-sub" id="p-stitle">Founder/CEO</div>
         <div class="sig-sub" style="margin-top:5px;line-height:1.7;">
           <span id="p-semail">Chase@AmericanExteriorSystems.com</span><br>
           Direct: <span id="p-sdirect">(303) 518-7997</span> &nbsp;&middot;&nbsp; Office: <span id="p-soffice">(480) 707-3707</span>
@@ -758,31 +758,32 @@ const DEFAULT_GC = [
 ];
 
 const DEFAULT_SCOPES = [
-  { title:"Scope of Work - Preparation / Mock-Up", enabled:true, notes:"", images:[], bullets:[
-    "Power-wash all areas getting painted; if mold is present use detergent",
-    "Inspect entire surface areas to be painted for any flaws and failures",
-    "Hand scrape all loose and peeling paint",
-    "Spot prime all bare stucco, metal, or wood using Sherwin Williams Loxon primers",
-    "Caulk all joints, cracks, windows, and doors",
-    "This bid includes one mock-up or sample; each sample is up to 20ft wide x 3 stories (Location TBD by management)",
-    "Additional mock-ups can be completed with a change order if needed",
-    "Design is the sole decision of management - includes up to a 4-color paint scheme"
+  { title:"Scope of Work - Preparation", enabled:true, notes:"", images:[], bullets:[
+    "Project mobilization, site setup, and coordination with property management for scheduling, access, and phased execution.",
+    "Protection of adjacent surfaces, landscaping, walkways, windows, doors, fixtures, vehicles, and all non painted surfaces in work areas.",
+    "Pressure washing and surface cleaning of all paintable exterior surfaces to remove dirt, chalking, mildew, loose debris, and contaminants to ensure proper coating adhesion.",
+    "Scraping, sanding, spot priming, caulking, and general surface preparation of all failing or deteriorated painted surfaces as needed prior to paint application.",
+    "Repair and patching of minor surface imperfections, cracks, and non structural stucco or substrate deficiencies directly related to paint preparation.",
+    "Application of primer where required on repaired, exposed, or bare surfaces to promote uniform finish and adhesion."
   ]},
   { title:"Scope of Work - Exterior Paint", enabled:true, notes:"", images:[], bullets:[
-    "APARTMENT BUILDINGS: all previously painted exterior surfaces",
-    "ACCESSORY BUILDINGS: Leasing center, mail kiosks, maintenance buildings, trash enclosures, attached garages, etc.",
-    "MISC PROPERTY ITEMS: Perimeter fencing, pool fencing, gazebos, grill areas, entry structures, both sides of the perimeter stucco wall, etc.",
-    "CARPORTS: Painted all previously painted surfaces (fascia, columns, walls, etc.)",
-    "Apply 2 coats of finish paint using Sherwin Williams Superpaint (Flat/Satin/Semi-Gloss per surface type)",
-    "Stucco and masonry: Sherwin Williams Superpaint Flat",
-    "Wood (fencing, trim, shutters): Sherwin Williams Superpaint Satin",
-    "Metal, railings, doors: Sherwin Williams Superpaint Semi-Gloss or ProCryl"
+    "Full repaint of all designated exterior building surfaces, including stucco, siding, trim, fascia, soffits, eaves, pop-outs, banding, and other previously painted architectural features.",
+    "Repainting of all entry and exterior doors, door frames, metal railings, wrought iron, stair components, breezeways, exposed utility doors, and other approved painted metal or wood surfaces.",
+    "Repainting of exterior common area features and site elements included in the approved scope, such as fencing, gates, handrails, carport posts, or similar items, if applicable.",
+    "Application of premium exterior coating system in accordance with manufacturer specifications listed below, including proper spread rates and number of coats required for complete coverage and uniform appearance.",
+    "Protection: Mask and protect all surfaces and items not intended for paint application.",
+    "Daily jobsite cleanup and debris removal, with all equipment, materials, and trash maintained in an orderly and safe condition throughout the duration of the project."
   ]},
   { title:"Scope of Work - Paint Specifications", enabled:true, notes:"", images:[], bullets:[
     "Masonry (stucco, soffits, eaves, drywall): Spot Prime LX02 Series - Finish Superpaint Flat",
     "Wood (fencing, shutters): Spot Prime PrepRite Problock - Finish Superpaint Flat",
     "Metal and Doors (stair stringers, railings, fire doors): Spot Prime ProCryl - Finish Shercryl HPA B66 Semi-Gloss",
     "All materials applied per manufacturer specifications - Full Coverage Guaranteed"
+  ]},
+  { title:"Mock-Up & Colors", enabled:true, notes:"", images:[], bullets:[
+    "This bid includes one mock-up or sample; each sample is up to 20ft wide x 3 stories (Location TBD by management)",
+    "Additional mock-ups can be completed with a change order if needed",
+    "Design is the sole decision of management - includes up to a 4-color paint scheme"
   ]},
   { title:"Scope of Work - Misc. Stucco / Drywall Repairs", enabled:true, notes:"", images:[], bullets:[
     "Property-wide repairs up to 20 sqft per location on all buildings and perimeter fencing",
@@ -1097,7 +1098,7 @@ function up() {
   document.getElementById('p-total').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits:2});
   document.getElementById('p-deposit').textContent = v('f-deposit') || '50% deposit required to commence work.';
   document.getElementById('p-sname').textContent = v('f-sname') || 'Chase McNary';
-  document.getElementById('p-stitle').textContent = v('f-stitle') || 'President';
+  document.getElementById('p-stitle').textContent = v('f-stitle') || 'Founder/CEO';
   document.getElementById('p-semail').textContent = v('f-semail') || 'Chase@AmericanExteriorSystems.com';
   document.getElementById('p-sdirect').textContent = v('f-sdirect') || '(303) 518-7997';
   document.getElementById('p-soffice').textContent = v('f-soffice') || '(480) 707-3707';
@@ -1118,7 +1119,7 @@ function resetAll() {
   document.getElementById('f-deposit').value = '50% deposit required to commence work, followed by progress payments based on project milestones and completion.';
   document.getElementById('f-pricing-desc').value = 'Pricing includes full exterior repaint and repairs of all previously painted surfaces. Pricing below includes all state taxes, waste costs, permits, fees, labor, equipment, and mobilization needed to perform the work listed.';
   document.getElementById('f-sname').value = 'Chase McNary';
-  document.getElementById('f-stitle').value = 'President';
+  document.getElementById('f-stitle').value = 'Founder/CEO';
   document.getElementById('f-semail').value = 'Chase@AmericanExteriorSystems.com';
   document.getElementById('f-sdirect').value = '(303) 518-7997';
   document.getElementById('f-soffice').value = '(480) 707-3707';
