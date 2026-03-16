@@ -317,6 +317,8 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
   <h1>AES <span>Proposal</span> Generator</h1>
   <div class="bar-actions">
     <button class="btn btn-ghost" onclick="resetAll()">&#8635; Reset</button>
+    <button class="btn btn-ghost" onclick="loadProposal()">&#128194; Load</button>
+    <button class="btn btn-ghost" onclick="saveProposal()">&#128190; Save</button>
     <button class="btn btn-red" onclick="window.print()">&#8595; Download PDF</button>
   </div>
 </div>
@@ -1262,6 +1264,119 @@ function renderRecentProjects() {
       '<div class="rc-grid">'+items+'</div>' +
     '</div>' +
     '<div class="page-bot"></div>';
+}
+
+// ── SAVE / LOAD ───────────────────────────────────────────────────────────────
+function saveProposal() {
+  var state = {
+    version: 1,
+    proj:        v('f-proj'),
+    client:      v('f-client'),
+    addr:        v('f-addr'),
+    type:        v('f-type'),
+    est:         v('f-est'),
+    date:        v('f-date'),
+    time:        v('f-time'),
+    deposit:     v('f-deposit'),
+    pricingDesc: v('f-pricing-desc'),
+    warranty:    v('f-warranty'),
+    exclusions:  v('f-exclusions'),
+    sname:       v('f-sname'),
+    stitle:      v('f-stitle'),
+    semail:      v('f-semail'),
+    sdirect:     v('f-sdirect'),
+    soffice:     v('f-soffice'),
+    clientLogo:    clientLogo,
+    photos:        photos,
+    priceLines:    priceLines,
+    scopes:        scopes,
+    gcItems:       gcItems,
+    recentProjects: recentProjects,
+    rcpId:         rcpId,
+    pageVisibility: pageVisibility
+  };
+  var json = JSON.stringify(state, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  var name = (v('f-proj') || 'proposal').replace(/[^a-z0-9]/gi, '_');
+  a.download = name + '_' + new Date().toISOString().slice(0, 10) + '.aes';
+  a.href = url;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadProposal() {
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.aes,.json,application/json';
+  inp.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        var state = JSON.parse(evt.target.result);
+        restoreProposal(state);
+      } catch(err) {
+        alert('Could not load file — make sure it is a valid AES proposal file.\n\n' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+function restoreProposal(state) {
+  // Form fields
+  var fields = ['proj','client','addr','type','est','date','time','deposit','sname','stitle','semail','sdirect','soffice'];
+  fields.forEach(function(f) {
+    var el = document.getElementById('f-' + f);
+    if (el && state[f] !== undefined) el.value = state[f];
+  });
+  if (state.pricingDesc !== undefined) document.getElementById('f-pricing-desc').value = state.pricingDesc;
+  if (state.warranty    !== undefined) document.getElementById('f-warranty').value    = state.warranty;
+  if (state.exclusions  !== undefined) document.getElementById('f-exclusions').value  = state.exclusions;
+
+  // State variables
+  clientLogo     = state.clientLogo     || null;
+  photos         = state.photos         || [];
+  priceLines     = state.priceLines     || [];
+  gcItems        = state.gcItems        || [];
+  recentProjects = state.recentProjects || [];
+  rcpId          = state.rcpId          || 9;
+  pageVisibility = state.pageVisibility || { toc:true, about:true, photos:true, process:true, cost:true, gc:true, rc:true };
+
+  // Scopes — restore directly, recalculate sid
+  scopes = state.scopes || [];
+  sid = scopes.reduce(function(mx, s) { return Math.max(mx, s.id || 0); }, 0);
+
+  // Page visibility — sync checkboxes
+  Object.keys(pageVisibility).forEach(function(key) {
+    var cb  = document.getElementById('pv-' + key);
+    var row = document.getElementById('pvr-' + key);
+    if (cb)  cb.checked = pageVisibility[key];
+    if (row) row.classList.toggle('off', !pageVisibility[key]);
+  });
+
+  // Client logo display
+  if (clientLogo) {
+    document.getElementById('cl-preview-wrap').style.display = 'block';
+    document.getElementById('cl-upload-zone').style.display  = 'none';
+  } else {
+    document.getElementById('cl-preview-wrap').style.display = 'none';
+    document.getElementById('cl-upload-zone').style.display  = 'block';
+  }
+  renderClientLogo();
+
+  // Re-render all dynamic sections
+  renderPriceLines();
+  renderScopeCards();
+  renderGCForm();
+  renderRCPList();
+  renderThumbs();
+  renderPhotosGrid();
+  up();
 }
 
 // ── PAGE VISIBILITY ──────────────────────────────────────────────────────────
