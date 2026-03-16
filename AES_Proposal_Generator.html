@@ -150,7 +150,7 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 /* PHOTOS PAGE */
 .photos-content{padding:28px 36px 60px;}
 .photos-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.photos-grid img{width:100%;height:220px;object-fit:cover;border-radius:4px;}
+.photos-grid img{width:100%;height:220px;object-fit:contain;border-radius:4px;background:var(--gray);}
 .photo-placeholder{width:100%;height:220px;background:var(--gray);border-radius:4px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:12px;}
 
 /* SCOPE PAGES */
@@ -162,11 +162,13 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .scope-box ul li:last-child{border-bottom:none;}
 .scope-box ul li::before{content:'▪';position:absolute;left:0;color:var(--red);font-size:9px;top:7px;}
 .scope-notes{background:#fff;border-left:3px solid var(--mid);padding:10px 14px;border-radius:0 4px 4px 0;font-size:12.5px;color:#555;line-height:1.6;margin-top:14px;}
-.scope-img-area{border:2px dashed #ccc;border-radius:4px;overflow:hidden;height:280px;display:flex;align-items:center;justify-content:center;background:var(--gray);}
-.scope-img-area img{width:100%;height:100%;object-fit:cover;}
+.scope-img-area{border:2px dashed #ccc;border-radius:4px;overflow:hidden;height:320px;display:flex;align-items:center;justify-content:center;background:var(--gray);}
+.scope-img-area img{width:100%;height:100%;object-fit:contain;background:var(--gray);}
+.scope-img-area.fit-cover img{object-fit:cover;}
 .scope-img-area.has-img{border:none;}
 .scope-img-area.two-imgs{display:grid;grid-template-columns:1fr 1fr;gap:8px;border:none;background:transparent;height:auto;}
-.scope-img-area.two-imgs img{height:280px;border-radius:4px;object-fit:cover;}
+.scope-img-area.two-imgs img{height:240px;border-radius:4px;object-fit:contain;background:var(--gray);}
+.scope-img-area.two-imgs.fit-cover img{object-fit:cover;}
 .scope-img-placeholder{color:#ccc;font-size:12px;text-align:center;}
 
 /* PROCESS PAGE */
@@ -818,15 +820,13 @@ function tog(hdr) {
 
 function handleClientLogo(inp) {
   var file = inp.files[0]; if(!file) return;
-  var r = new FileReader();
-  r.onload = function(e) {
-    clientLogo = e.target.result;
+  compressImage(file, 600, 600, 0.8, function(src) {
+    clientLogo = src;
     document.getElementById('cl-preview-img').src = clientLogo;
     document.getElementById('cl-preview-wrap').style.display = 'block';
     document.getElementById('cl-upload-zone').style.display = 'none';
     renderClientLogo();
-  };
-  r.readAsDataURL(file);
+  });
   inp.value = '';
 }
 function removeClientLogo() {
@@ -853,6 +853,7 @@ function addScope(data) {
     notes: (data && data.notes) ? data.notes : '',
     images: (data && data.images) ? data.images : [],
     showImg: (data && data.showImg === false) ? false : true,
+    imgFit: (data && data.imgFit) ? data.imgFit : 'contain',
     bullets: (data && data.bullets) ? data.bullets : ['']
   });
   renderScopeCards();
@@ -893,17 +894,35 @@ function removeBullet(id, i) {
   var s = scopes.find(function(s) { return s.id === id; });
   if(s && s.bullets.length > 1) { s.bullets.splice(i, 1); renderScopeCards(); up(); }
 }
+function compressImage(file, maxW, maxH, quality, cb) {
+  var r = new FileReader();
+  r.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width, h = img.height;
+      if(w > maxW || h > maxH) {
+        var ratio = Math.min(maxW / w, maxH / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      var c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(c.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  r.readAsDataURL(file);
+}
 function handleScopeImg(id, inp) {
   var s = scopes.find(function(s) { return s.id === id; });
   if(!s || s.images.length >= 2) return;
   var files = Array.from(inp.files).slice(0, 2 - s.images.length);
   files.forEach(function(f) {
-    var r = new FileReader();
-    r.onload = function(e) {
-      s.images.push({ id: Date.now() + Math.random(), src: e.target.result });
+    compressImage(f, 1200, 900, 0.72, function(src) {
+      s.images.push({ id: Date.now() + Math.random(), src: src });
       renderScopeCards(); up();
-    };
-    r.readAsDataURL(f);
+    });
   });
   inp.value = '';
 }
@@ -914,6 +933,10 @@ function removeScopeImg(scopeId, imgId) {
 function toggleScopeImg(id, checked) {
   var s = scopes.find(function(s) { return s.id === id; });
   if(s) { s.showImg = checked; renderScopeCards(); up(); }
+}
+function setScopeImgFit(id, val) {
+  var s = scopes.find(function(s) { return s.id === id; });
+  if(s) { s.imgFit = val; renderScopeCards(); up(); }
 }
 
 function renderScopeCards() {
@@ -953,7 +976,14 @@ function renderScopeCards() {
           '<label class="pv-switch"><input type="checkbox" ' + (s.showImg ? 'checked' : '') + ' onchange="toggleScopeImg(' + s.id + ',this.checked)"><span class="pv-slider"></span></label>' +
         '</div>' +
         (s.showImg
-          ? uploadBtn + '<div class="img-thumbs">' + thumbs + '</div>'
+          ? '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+              '<label style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--mid);">Image Fit</label>' +
+              '<select onchange="setScopeImgFit(' + s.id + ',this.value)" style="font-size:11px;padding:3px 6px;border:1px solid #ddd;border-radius:3px;">' +
+                '<option value="contain"' + (s.imgFit !== 'cover' ? ' selected' : '') + '>Fit Whole Image</option>' +
+                '<option value="cover"' + (s.imgFit === 'cover' ? ' selected' : '') + '>Fill &amp; Crop</option>' +
+              '</select>' +
+            '</div>' +
+            uploadBtn + '<div class="img-thumbs">' + thumbs + '</div>'
           : '<div style="font-size:11px;color:#bbb;text-align:center;padding:5px 0;border:1px dashed #eee;border-radius:3px;">Image hidden on this page</div>'
         ) +
       '</div>' +
@@ -963,12 +993,10 @@ function renderScopeCards() {
 
 function handlePhotos(inp) {
   Array.from(inp.files).slice(0, 6 - photos.length).forEach(function(f) {
-    var r = new FileReader();
-    r.onload = function(e) {
-      photos.push({ id: Date.now() + Math.random(), src: e.target.result });
+    compressImage(f, 1200, 900, 0.72, function(src) {
+      photos.push({ id: Date.now() + Math.random(), src: src });
       renderThumbs(); renderPhotosGrid();
-    };
-    r.readAsDataURL(f);
+    });
   });
   inp.value = '';
 }
@@ -1058,10 +1086,11 @@ function renderScopePages() {
     var bullets = s.bullets.filter(function(b) { return b.trim(); }).map(function(b) { return '<li>' + esc(b) + '</li>'; }).join('');
     var imgHtml = '';
     if(s.showImg !== false) {
+      var fitClass = s.imgFit === 'cover' ? ' fit-cover' : '';
       if(s.images.length === 2) {
-        imgHtml = '<div class="scope-img-area two-imgs"><img src="' + s.images[0].src + '" alt=""><img src="' + s.images[1].src + '" alt=""></div>';
+        imgHtml = '<div class="scope-img-area two-imgs' + fitClass + '"><img src="' + s.images[0].src + '" alt=""><img src="' + s.images[1].src + '" alt=""></div>';
       } else if(s.images.length === 1) {
-        imgHtml = '<div class="scope-img-area has-img"><img src="' + s.images[0].src + '" alt=""></div>';
+        imgHtml = '<div class="scope-img-area has-img' + fitClass + '"><img src="' + s.images[0].src + '" alt=""></div>';
       } else {
         imgHtml = '<div class="scope-img-area"><div class="scope-img-placeholder"><span style="font-size:28px">&#128247;</span><br>Mock-Up Location (upload image)</div></div>';
       }
@@ -1212,12 +1241,10 @@ function rcpField(id, field, val) {
 
 function handleRCPPhoto(id, input) {
   if(!input.files[0]) return;
-  var r = new FileReader();
-  r.onload = function(e) {
+  compressImage(input.files[0], 800, 600, 0.72, function(src) {
     var p = recentProjects.find(function(x){return x.id===id;});
-    if(p) { p.photo = e.target.result; renderRCPList(); up(); }
-  };
-  r.readAsDataURL(input.files[0]);
+    if(p) { p.photo = src; renderRCPList(); up(); }
+  });
 }
 
 function removeRCP(id) {
