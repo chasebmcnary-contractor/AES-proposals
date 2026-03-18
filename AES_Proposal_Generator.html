@@ -230,14 +230,14 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .section-title{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;border-left:6px solid var(--red);padding-left:14px;}
 
 /* RECENTLY COMPLETED PAGE */
-.rc-content{padding:28px 36px 60px;}
-.rc-intro{font-size:12.5px;color:#555;line-height:1.65;margin-bottom:24px;border-left:4px solid var(--blue);padding-left:12px;}
-.rc-grid{display:flex;flex-direction:column;gap:18px;}
-.rc-item{display:grid;grid-template-columns:220px 1fr;gap:18px;align-items:start;border-bottom:1px solid #eee;padding-bottom:18px;}
+.rc-content{padding:26px 36px 55px;}
+.rc-intro{font-size:12.5px;color:#555;line-height:1.65;margin-bottom:20px;border-left:4px solid var(--blue);padding-left:12px;}
+.rc-grid{display:flex;flex-direction:column;gap:16px;}
+.rc-item{display:grid;grid-template-columns:210px 1fr;gap:16px;align-items:start;border-bottom:1px solid #eee;padding-bottom:16px;}
 .rc-item:last-child{border-bottom:none;padding-bottom:0;}
-.rc-photo{width:220px;height:150px;object-fit:cover;border-radius:4px;}
-.rc-photo-placeholder{width:220px;height:150px;background:var(--gray);border-radius:4px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:11px;}
-.rc-details h3{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--dark);border-bottom:2px solid var(--blue);padding-bottom:4px;margin-bottom:8px;display:inline-block;}
+.rc-photo{width:210px;height:142px;object-fit:cover;border-radius:4px;}
+.rc-photo-placeholder{width:210px;height:142px;background:var(--gray);border-radius:4px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:11px;}
+.rc-details h3{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--dark);border-bottom:2px solid var(--blue);padding-bottom:4px;margin-bottom:7px;display:inline-block;}
 .rc-details ul{list-style:none;}
 .rc-details ul li{font-size:12.5px;color:#444;padding:2px 0 2px 14px;position:relative;line-height:1.5;}
 .rc-details ul li::before{content:'•';position:absolute;left:0;color:var(--blue);font-size:14px;top:1px;}
@@ -380,7 +380,10 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
         <div class="field"><label>Buildings</label><input id="f-bldgs" type="text" placeholder="42" oninput="up()"></div>
         <div class="field"><label>Total Units</label><input id="f-units" type="text" placeholder="236" oninput="up()"></div>
       </div>
-      <div class="field"><label>Estimator</label><input id="f-est" type="text" value="Chase McNary" oninput="up()"></div>
+      <div class="frow">
+        <div class="field"><label>Estimator</label><input id="f-est" type="text" value="Chase McNary" oninput="up()"></div>
+        <div class="field"><label>Estimator Phone</label><input id="f-est-phone" type="text" placeholder="(555) 555-5555" oninput="up()"></div>
+      </div>
     </div>
   </div>
 
@@ -432,6 +435,10 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
       </div>
       <div id="price-lines"></div>
       <button class="add-line" onclick="addLine()">+ Add Line Item</button>
+      <div style="margin-top:10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+        <label class="pv-switch"><input type="checkbox" id="f-show-total" checked onchange="toggleTotal(this.checked)"><span class="pv-slider"></span></label>
+        <span style="font-size:11px;font-weight:600;color:var(--dark);">Show Total Cost on Proposal</span>
+      </div>
       <div class="field" style="margin-top:12px;"><label>Deposit / Billing Terms</label>
         <input id="f-deposit" type="text" value="50% deposit required to commence work, followed by progress payments based on project milestones and completion." oninput="up()">
       </div>
@@ -491,6 +498,9 @@ Any additional work not explicitly listed above</textarea>
     <div class="fs-hdr" onclick="tog(this)">&#9320; Recently Completed <span>&#9662;</span></div>
     <div class="fs-body">
       <p style="font-size:10px;color:var(--mid);margin-bottom:9px;">Add completed projects to showcase your experience. Upload a photo and fill in details for each.</p>
+      <div class="field"><label>Intro Text</label>
+        <textarea id="f-rc-intro" rows="3" oninput="up()">The projects listed below were recently completed by our dedicated subcontractor team, specifically selected for your project. All projects were sold and managed by Chase McNary, and are now presented under American Exterior Systems.</textarea>
+      </div>
       <div class="rcp-list" id="rcp-list"></div>
       <button class="add-rcp-btn" onclick="addRCP()">&#65291; Add Project</button>
     </div>
@@ -528,6 +538,7 @@ Any additional work not explicitly listed above</textarea>
         <div class="meta-item"><label>Project Type</label><span id="p-type">Exterior Repaint</span></div>
         <div class="meta-item"><label>Address</label><span id="p-addr">&#8212;</span></div>
         <div class="meta-item"><label>Estimator</label><span id="p-est">Chase McNary</span></div>
+        <div class="meta-item" id="p-est-phone-row"><label>Estimator Phone</label><span id="p-est-phone">&#8212;</span></div>
       </div>
     </div>
     <div class="cover-client-panel">
@@ -1067,16 +1078,38 @@ function renderGCPage() {
 }
 
 function renderTOC() {
-  var fixed = ['Cover','Estimate Summary','Why AES','Pictures of Project'];
+  // Build list of visible pages only (skip hidden ones)
+  var entries = [];
+  if(pageVisibility.about)   entries.push({label:'Why AES', isScope:false});
+  if(pageVisibility.photos)  entries.push({label:'Pictures of Project', isScope:false});
   var scopeTitles = scopes.filter(function(s) { return s.enabled; }).map(function(s) { return s.title; });
-  var tail = ['Our Process / Warranty','Project Cost','General Conditions','Recently Completed'];
-  var all = fixed.concat(scopeTitles).concat(tail);
-  var fixedCount = fixed.length;
-  var scopeEnd = fixedCount + scopeTitles.length;
-  document.getElementById('toc-list').innerHTML = all.map(function(t, i) {
-    return '<div class="toc-item' + (i >= fixedCount && i < scopeEnd ? ' active' : '') + '">' +
-      '<div class="toc-num">' + (i+1) + '</div>' +
-      '<div class="toc-label">' + esc(t) + '</div>' +
+  scopeTitles.forEach(function(t) { entries.push({label:t, isScope:true}); });
+  if(pageVisibility.process) entries.push({label:'Our Process / Warranty', isScope:false});
+  if(pageVisibility.cost)    entries.push({label:'Project Cost', isScope:false});
+  if(pageVisibility.gc)      entries.push({label:'General Conditions', isScope:false});
+  if(pageVisibility.rc)      entries.push({label:'Recently Completed', isScope:false});
+
+  // Calculate how many printed pages the TOC occupies based on item count.
+  // Tested: ~13 items fit on the first TOC page (title + decorations eat space).
+  // Continuation pages fit ~17 items (no title, just items + padding).
+  var MAX_FIRST_PAGE = 13;
+  var MAX_CONT_PAGE  = 17;
+  var tocPages = 1;
+  if(entries.length > MAX_FIRST_PAGE) {
+    tocPages = 1 + Math.ceil((entries.length - MAX_FIRST_PAGE) / MAX_CONT_PAGE);
+  }
+
+  // Page numbering:
+  // Cover = page 1, TOC starts on page 2 and spans tocPages pages.
+  // First content page = 2 + tocPages
+  // 1 TOC page  → startPage = 3  (Cover=1, TOC=2, content=3)
+  // 2 TOC pages → startPage = 4  (Cover=1, TOC=2-3, content=4)
+  var startPage = 2 + tocPages;
+
+  document.getElementById('toc-list').innerHTML = entries.map(function(e, i) {
+    return '<div class="toc-item' + (e.isScope ? ' active' : '') + '">' +
+      '<div class="toc-num">' + (startPage + i) + '</div>' +
+      '<div class="toc-label">' + esc(e.label) + '</div>' +
       '</div>';
   }).join('');
 }
@@ -1128,6 +1161,9 @@ function up() {
   document.getElementById('p-type').textContent = v('f-type') || 'Exterior Repaint';
   document.getElementById('p-addr').textContent = v('f-addr') || '\u2014';
   document.getElementById('p-est').textContent = v('f-est') || 'Chase McNary';
+  var estPhone = v('f-est-phone');
+  document.getElementById('p-est-phone').textContent = estPhone || '\u2014';
+  document.getElementById('p-est-phone-row').style.display = estPhone ? '' : 'none';
   var dr = v('f-date');
   document.getElementById('p-date').textContent = dr ? new Date(dr + 'T12:00:00').toLocaleDateString('en-US', {month:'2-digit',day:'2-digit',year:'numeric'}) : '\u2014';
   document.getElementById('p-time').textContent = v('f-time') || '60-120 Days depending on scope';
@@ -1139,6 +1175,8 @@ function up() {
     return '<tr><td>' + (esc(l.desc) || '\u2014') + '</td><td style="text-align:right;">$' + amt.toLocaleString('en-US', {minimumFractionDigits:2}) + '</td></tr>';
   }).join('');
   document.getElementById('p-total').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits:2});
+  var tfoot = document.querySelector('#pg-cost .price-table tfoot');
+  if(tfoot) tfoot.style.display = showTotal ? '' : 'none';
   document.getElementById('p-deposit').textContent = v('f-deposit') || '50% deposit required to commence work.';
   document.getElementById('p-sname').textContent = v('f-sname') || 'Chase McNary';
   document.getElementById('p-stitle').textContent = v('f-stitle') || 'Founder/CEO';
@@ -1158,6 +1196,9 @@ function resetAll() {
   document.getElementById('f-addr').value = '';
   document.getElementById('f-type').value = 'Exterior Repaint';
   document.getElementById('f-est').value = 'Chase McNary';
+  document.getElementById('f-est-phone').value = '';
+  showTotal = true;
+  document.getElementById('f-show-total').checked = true;
   document.getElementById('f-time').value = '60-120 Days depending on scope';
   document.getElementById('f-deposit').value = '50% deposit required to commence work, followed by progress payments based on project milestones and completion.';
   document.getElementById('f-pricing-desc').value = 'Pricing includes full exterior repaint and repairs of all previously painted surfaces. Pricing below includes all state taxes, waste costs, permits, fees, labor, equipment, and mobilization needed to perform the work listed.';
@@ -1223,6 +1264,9 @@ function renderRCPList() {
       '</div>' +
     '</div>';
   }).join('');
+  // Hide/show add button based on cap
+  var addBtn = document.querySelector('.add-rcp-btn');
+  if(addBtn) addBtn.style.display = recentProjects.length >= MAX_RECENT_PROJECTS ? 'none' : '';
 }
 
 function toggleRCP(id) {
@@ -1252,7 +1296,13 @@ function removeRCP(id) {
   renderRCPList(); up();
 }
 
+var MAX_RECENT_PROJECTS = 4; // keep Recently Completed to 1 printed page
+
 function addRCP(data) {
+  if(recentProjects.length >= MAX_RECENT_PROJECTS) {
+    alert('Maximum ' + MAX_RECENT_PROJECTS + ' recently completed projects to keep the section to one page.');
+    return;
+  }
   var p = data || {id:rcpId++, name:'', mgmt:'', addr:'', scope:'', buildings:'', units:'', photo:null};
   if(!data) p.id = rcpId++;
   recentProjects.push(p);
@@ -1269,9 +1319,11 @@ function renderRecentProjects() {
     '<div class="p-hdr"><div class="p-hdr-logo"><img src="' + LOGO + '" alt="AES"></div>' +
     '<div class="p-hdr-right">ROC# 356389 &nbsp;&middot;&nbsp; 480-707-3707<br>www.AmericanExteriorSystems.com</div></div>';
 
-  var introText = 'The projects listed below were recently completed by our dedicated subcontractor team, specifically selected for your project. All projects were sold and managed by Chase McNary, and are now presented under American Exterior Systems.';
+  var introText = v('f-rc-intro') || 'The projects listed below were recently completed by our dedicated subcontractor team, specifically selected for your project. All projects were sold and managed by Chase McNary, and are now presented under American Exterior Systems.';
 
-  var items = recentProjects.map(function(p) {
+  // Only render up to MAX_RECENT_PROJECTS to keep it to 1 printed page
+  var displayProjects = recentProjects.slice(0, MAX_RECENT_PROJECTS);
+  var items = displayProjects.map(function(p) {
     var photo = p.photo ?
       '<img class="rc-photo" src="'+p.photo+'" alt="'+esc(p.name)+'">' :
       '<div class="rc-photo-placeholder">No Photo</div>';
@@ -1302,12 +1354,14 @@ function saveProposal() {
     addr:        v('f-addr'),
     type:        v('f-type'),
     est:         v('f-est'),
+    'est-phone': v('f-est-phone'),
     date:        v('f-date'),
     time:        v('f-time'),
     deposit:     v('f-deposit'),
     pricingDesc: v('f-pricing-desc'),
     warranty:    v('f-warranty'),
     exclusions:  v('f-exclusions'),
+    rcIntro:     v('f-rc-intro'),
     sname:       v('f-sname'),
     stitle:      v('f-stitle'),
     semail:      v('f-semail'),
@@ -1320,7 +1374,8 @@ function saveProposal() {
     gcItems:       gcItems,
     recentProjects: recentProjects,
     rcpId:         rcpId,
-    pageVisibility: pageVisibility
+    pageVisibility: pageVisibility,
+    showTotal: showTotal
   };
   var json = JSON.stringify(state, null, 2);
   var blob = new Blob([json], { type: 'application/json' });
@@ -1356,7 +1411,7 @@ function loadProposal() {
 
 function restoreProposal(state) {
   // Form fields
-  var fields = ['proj','client','addr','type','est','date','time','deposit','sname','stitle','semail','sdirect','soffice'];
+  var fields = ['proj','client','addr','type','est','date','time','deposit','sname','stitle','semail','sdirect','soffice','est-phone'];
   fields.forEach(function(f) {
     var el = document.getElementById('f-' + f);
     if (el && state[f] !== undefined) el.value = state[f];
@@ -1364,6 +1419,7 @@ function restoreProposal(state) {
   if (state.pricingDesc !== undefined) document.getElementById('f-pricing-desc').value = state.pricingDesc;
   if (state.warranty    !== undefined) document.getElementById('f-warranty').value    = state.warranty;
   if (state.exclusions  !== undefined) document.getElementById('f-exclusions').value  = state.exclusions;
+  if (state.rcIntro     !== undefined) document.getElementById('f-rc-intro').value    = state.rcIntro;
 
   // State variables
   clientLogo     = state.clientLogo     || null;
@@ -1373,6 +1429,9 @@ function restoreProposal(state) {
   recentProjects = state.recentProjects || [];
   rcpId          = state.rcpId          || 9;
   pageVisibility = state.pageVisibility || { toc:true, about:true, photos:true, process:true, cost:true, gc:true, rc:true };
+  showTotal = state.showTotal !== undefined ? state.showTotal : true;
+  var stCb = document.getElementById('f-show-total');
+  if(stCb) stCb.checked = showTotal;
 
   // Scopes — restore directly, recalculate sid
   scopes = state.scopes || [];
@@ -1404,6 +1463,14 @@ function restoreProposal(state) {
   renderThumbs();
   renderPhotosGrid();
   up();
+}
+
+// ── TOTAL COST TOGGLE ────────────────────────────────────────────────────────
+var showTotal = true;
+function toggleTotal(on) {
+  showTotal = on;
+  var tfoot = document.querySelector('#pg-cost .price-table tfoot');
+  if(tfoot) tfoot.style.display = on ? '' : 'none';
 }
 
 // ── PAGE VISIBILITY ──────────────────────────────────────────────────────────
