@@ -38,11 +38,17 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 
 /* Scope cards */
 .sc-list{display:flex;flex-direction:column;gap:7px;}
-.sc{border:1px solid #ddd;border-radius:5px;overflow:hidden;}
+.sc{border:1px solid #ddd;border-radius:5px;overflow:hidden;transition:transform .15s,box-shadow .15s;}
 .sc.on{border-color:var(--blue);}
+.sc.dragging{opacity:.45;transform:scale(.97);box-shadow:0 4px 16px rgba(0,0,0,.18);}
+.sc-list .drag-over-top{border-top:3px solid var(--blue);}
+.sc-list .drag-over-bottom{border-bottom:3px solid var(--blue);}
 .sc-hdr{display:flex;align-items:center;gap:9px;padding:9px 11px;background:#fafafa;cursor:pointer;}
 .sc.on .sc-hdr{background:#eef2ff;}
 .sc-hdr:hover{background:#f0f4ff;}
+.sc-drag{cursor:grab;color:#bbb;font-size:16px;flex-shrink:0;padding:2px 4px;user-select:none;display:flex;align-items:center;}
+.sc-drag:active{cursor:grabbing;}
+.sc-drag:hover{color:var(--blue);}
 .sc-hdr input[type=checkbox]{width:14px;height:14px;accent-color:var(--blue);flex-shrink:0;}
 .sc-name{font-weight:600;font-size:12px;flex:1;}
 .sc-btns{display:flex;gap:4px;margin-left:auto;}
@@ -54,9 +60,20 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .sc-body.open{display:block;}
 .bullet-list{margin-bottom:6px;}
 .bullet-row{display:flex;gap:5px;align-items:flex-start;margin-bottom:5px;}
+.bullet-row .bullet-drag{cursor:grab;color:#ccc;font-size:14px;flex-shrink:0;padding:2px 2px;user-select:none;display:flex;align-items:center;margin-top:6px;}
+.bullet-row .bullet-drag:active{cursor:grabbing;}
+.bullet-row .bullet-drag:hover{color:var(--blue);}
+.bullet-row.bullet-dragging{opacity:.45;}
+.bullet-list .bullet-drag-over-top{border-top:2px solid var(--blue);}
+.bullet-list .bullet-drag-over-bottom{border-bottom:2px solid var(--blue);}
 .bullet-row textarea{flex:1;min-height:34px;font-size:12px;padding:5px 7px;border:1px solid #ddd;border-radius:3px;}
 .bullet-row button{background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;margin-top:6px;}
 .bullet-row button:hover{color:var(--red);}
+.fmt-bar{display:flex;gap:3px;margin-bottom:2px;}
+.fmt-bar button{background:#f0f0f0;border:1px solid #ddd;border-radius:3px;padding:2px 7px;font-size:11px;cursor:pointer;color:#555;font-weight:400;line-height:1.4;}
+.fmt-bar button:hover{background:#e0e4ff;border-color:var(--blue);color:var(--blue);}
+.fmt-bar button.fmt-bold{font-weight:800;}
+.fmt-bar button.fmt-italic{font-style:italic;}
 .add-bullet{background:none;border:1px dashed #ccc;border-radius:3px;padding:4px 9px;width:100%;font-size:11px;color:var(--mid);cursor:pointer;}
 .add-bullet:hover{border-color:var(--blue);color:var(--blue);}
 .img-zone{border:2px dashed #ccc;border-radius:3px;padding:10px;text-align:center;cursor:pointer;background:#fafafa;font-size:11px;color:var(--mid);margin-top:8px;}
@@ -148,19 +165,21 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .toc-deco-br{position:absolute;bottom:30px;right:30px;width:100px;height:100px;background:var(--blue);clip-path:polygon(100% 0,0 100%,100% 100%);filter:drop-shadow(4px 4px 6px rgba(0,0,0,.35));}
 
 /* PHOTOS PAGE */
-.photos-content{padding:28px 36px 60px;}
+.photos-content{padding:28px 36px 18px;}
 .photos-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .photos-grid img{width:100%;height:220px;object-fit:contain;border-radius:4px;background:var(--gray);}
 .photo-placeholder{width:100%;height:220px;background:var(--gray);border-radius:4px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:12px;}
 
 /* SCOPE PAGES */
-.scope-content{padding:28px 36px 60px;}
+.scope-content{padding:28px 36px 18px;}
 .scope-box{background:var(--gray);border-radius:4px;padding:16px 18px;border-top:3px solid var(--blue);margin-bottom:16px;}
 .scope-box h4{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;}
 .scope-box ul{list-style:none;}
 .scope-box ul li{font-size:12.5px;padding:4px 0 4px 14px;position:relative;border-bottom:1px solid #ddd;color:#444;line-height:1.5;}
 .scope-box ul li:last-child{border-bottom:none;}
 .scope-box ul li::before{content:'▪';position:absolute;left:0;color:var(--red);font-size:9px;top:7px;}
+.scope-box ul li strong{font-weight:700;color:var(--dark);}
+.scope-box ul li em{font-style:italic;}
 .scope-notes{background:#fff;border-left:3px solid var(--mid);padding:10px 14px;border-radius:0 4px 4px 0;font-size:12.5px;color:#555;line-height:1.6;margin-top:14px;}
 .scope-img-area{border:2px dashed #ccc;border-radius:4px;overflow:hidden;height:320px;display:flex;align-items:center;justify-content:center;background:var(--gray);}
 .scope-img-area img{width:100%;height:100%;object-fit:contain;background:var(--gray);}
@@ -172,7 +191,7 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .scope-img-placeholder{color:#ccc;font-size:12px;text-align:center;}
 
 /* PROCESS PAGE */
-.process-content{padding:28px 36px 60px;}
+.process-content{padding:28px 36px 18px;}
 .process-steps{display:grid;grid-template-columns:repeat(4,1fr);position:relative;margin:20px 0 10px;}
 .process-steps::before{content:'';position:absolute;top:19px;left:12%;right:12%;height:2px;background:var(--blue);z-index:0;}
 .p-step{text-align:center;position:relative;z-index:1;}
@@ -198,7 +217,7 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .w-box.orange ul li::before{color:#f97316;}
 
 /* PRICING PAGE */
-.pricing-content{padding:28px 36px 60px;}
+.pricing-content{padding:28px 36px 18px;}
 .pricing-desc{font-size:12.5px;color:#555;line-height:1.65;margin-bottom:18px;}
 .price-table{width:100%;border-collapse:collapse;margin-bottom:18px;}
 .price-table thead tr{background:var(--dark);color:#fff;}
@@ -220,7 +239,7 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .sig-sub{font-size:12px;color:var(--mid);}
 
 /* GC PAGE */
-.gc-content{padding:28px 36px 60px;}
+.gc-content{padding:28px 36px 18px;}
 .gc-list{list-style:none;}
 .gc-list li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f0f0f0;font-size:12.5px;color:#444;line-height:1.5;}
 .gc-list li:last-child{border-bottom:none;}
@@ -230,7 +249,7 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .section-title{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;border-left:6px solid var(--red);padding-left:14px;}
 
 /* RECENTLY COMPLETED PAGE */
-.rc-content{padding:26px 36px 55px;}
+.rc-content{padding:26px 36px 18px;}
 .rc-intro{font-size:12.5px;color:#555;line-height:1.65;margin-bottom:20px;border-left:4px solid var(--blue);padding-left:12px;}
 .rc-grid{display:flex;flex-direction:column;gap:16px;}
 .rc-item{display:grid;grid-template-columns:210px 1fr;gap:16px;align-items:start;border-bottom:1px solid #eee;padding-bottom:16px;}
@@ -303,12 +322,17 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .why-free-bar-items span::before{content:'✓ ';font-weight:800;color:rgba(255,255,255,.6);}
 
 @media print{
+  @page{margin:0.25in 0.35in 0.2in 0.35in;}
   body{background:#fff;}
   .app-bar,.form-panel,.preview-lbl{display:none!important;}
   .workspace{display:block;}
   .preview-panel{padding:0;}
   #doc{box-shadow:none;margin:0;width:100%;}
   .page{page-break-after:always;width:100%;min-height:auto;}
+  .page-bot{position:relative!important;margin-top:auto;}
+  .scope-content,.photos-content,.process-content,.pricing-content,.gc-content,.rc-content,.about-content{padding-bottom:10px!important;}
+  .scope-img-area{height:280px;}
+  .scope-img-area.two-imgs img{height:200px;}
 }
 </style>
 </head>
@@ -953,8 +977,15 @@ function setScopeImgFit(id, val) {
 function renderScopeCards() {
   document.getElementById('sc-list').innerHTML = scopes.map(function(s) {
     var bullets = s.bullets.map(function(b, i) {
-      return '<div class="bullet-row">' +
-        '<textarea oninput="setBullet(' + s.id + ',' + i + ',this.value)" placeholder="Bullet point...">' + esc(b) + '</textarea>' +
+      return '<div class="bullet-row" draggable="true" ondragstart="bulletDragStart(event,' + s.id + ',' + i + ')" ondragend="bulletDragEnd(event)" ondragover="bulletDragOver(event,' + s.id + ',' + i + ')" ondragleave="bulletDragLeave(event)" ondrop="bulletDrop(event,' + s.id + ',' + i + ')">' +
+        '<span class="bullet-drag" title="Drag to reorder">&#9776;</span>' +
+        '<div style="flex:1;display:flex;flex-direction:column;">' +
+          '<div class="fmt-bar">' +
+            '<button class="fmt-bold" onclick="insertFmt(' + s.id + ',' + i + ',\'bold\')" title="Bold">B</button>' +
+            '<button class="fmt-italic" onclick="insertFmt(' + s.id + ',' + i + ',\'italic\')" title="Italic">I</button>' +
+          '</div>' +
+          '<textarea id="bt-' + s.id + '-' + i + '" oninput="setBullet(' + s.id + ',' + i + ',this.value)" placeholder="Bullet point... (use **bold** or *italic*)">' + esc(b) + '</textarea>' +
+        '</div>' +
         '<button onclick="removeBullet(' + s.id + ',' + i + ')">&#215;</button>' +
         '</div>';
     }).join('');
@@ -965,8 +996,9 @@ function renderScopeCards() {
       ? '<div class="img-zone" onclick="document.getElementById(\'si-' + s.id + '\').click()">&#128247; ' + (s.images.length === 0 ? 'Upload up to 2 images' : 'Upload 1 more image') + '</div>' +
         '<input type="file" id="si-' + s.id + '" accept="image/*" multiple style="display:none" onchange="handleScopeImg(' + s.id + ',this)">'
       : '';
-    return '<div class="sc ' + (s.enabled ? 'on' : '') + '" id="sc-' + s.id + '">' +
+    return '<div class="sc ' + (s.enabled ? 'on' : '') + '" id="sc-' + s.id + '" draggable="true" ondragstart="scopeDragStart(event,' + s.id + ')" ondragend="scopeDragEnd(event)" ondragover="scopeDragOver(event,' + s.id + ')" ondragleave="scopeDragLeave(event)" ondrop="scopeDrop(event,' + s.id + ')">' +
       '<div class="sc-hdr">' +
+        '<span class="sc-drag" title="Drag to reorder">&#9776;</span>' +
         '<input type="checkbox" ' + (s.enabled ? 'checked' : '') + ' onchange="toggleScope(' + s.id + ',this.checked)">' +
         '<span class="sc-name" onclick="expandScope(' + s.id + ')">' + esc(s.title) + '</span>' +
         '<div class="sc-btns">' +
@@ -977,7 +1009,7 @@ function renderScopeCards() {
       '<div class="sc-body" id="scb-' + s.id + '">' +
         '<div class="field"><label>Title</label><input type="text" value="' + esc(s.title) + '" oninput="setScopeTitle(' + s.id + ',this.value)"></div>' +
         '<div class="field"><label>Bullet Points</label></div>' +
-        '<div class="bullet-list">' + bullets + '</div>' +
+        '<div class="bullet-list" id="bl-' + s.id + '">' + bullets + '</div>' +
         '<button class="add-bullet" onclick="addBullet(' + s.id + ')">+ Add Bullet</button>' +
         '<div class="field" style="margin-top:10px;"><label>Additional Notes (optional)</label>' +
           '<textarea placeholder="Extra context..." oninput="setScopeNotes(' + s.id + ',this.value)">' + esc(s.notes) + '</textarea>' +
@@ -1000,6 +1032,118 @@ function renderScopeCards() {
       '</div>' +
     '</div>';
   }).join('');
+}
+
+// ── SCOPE DRAG & DROP ────────────────────────────────────────────────────────
+var dragScopeId = null;
+function scopeDragStart(e, id) {
+  // Only allow drag from the handle
+  if(!e.target.closest('.sc-drag')) { e.preventDefault(); return; }
+  dragScopeId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', 'scope-' + id);
+  setTimeout(function(){ var el = document.getElementById('sc-' + id); if(el) el.classList.add('dragging'); }, 0);
+}
+function scopeDragEnd(e) {
+  dragScopeId = null;
+  document.querySelectorAll('.sc').forEach(function(el) { el.classList.remove('dragging','drag-over-top','drag-over-bottom'); });
+}
+function scopeDragOver(e, id) {
+  if(dragScopeId === null || dragScopeId === id) return;
+  if(!e.dataTransfer.types.includes('text/plain')) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  var rect = e.currentTarget.getBoundingClientRect();
+  var mid = rect.top + rect.height / 2;
+  e.currentTarget.classList.remove('drag-over-top','drag-over-bottom');
+  e.currentTarget.classList.add(e.clientY < mid ? 'drag-over-top' : 'drag-over-bottom');
+}
+function scopeDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over-top','drag-over-bottom');
+}
+function scopeDrop(e, targetId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over-top','drag-over-bottom');
+  if(dragScopeId === null || dragScopeId === targetId) return;
+  var fromIdx = scopes.findIndex(function(s) { return s.id === dragScopeId; });
+  var toIdx   = scopes.findIndex(function(s) { return s.id === targetId; });
+  if(fromIdx < 0 || toIdx < 0) return;
+  var rect = e.currentTarget.getBoundingClientRect();
+  var mid = rect.top + rect.height / 2;
+  var item = scopes.splice(fromIdx, 1)[0];
+  var insertIdx = scopes.findIndex(function(s) { return s.id === targetId; });
+  if(e.clientY >= mid) insertIdx++;
+  scopes.splice(insertIdx, 0, item);
+  dragScopeId = null;
+  renderScopeCards(); up();
+}
+
+// ── BULLET DRAG & DROP ───────────────────────────────────────────────────────
+var dragBulletScope = null, dragBulletIdx = null;
+function bulletDragStart(e, scopeId, idx) {
+  if(!e.target.closest('.bullet-drag')) { e.preventDefault(); return; }
+  dragBulletScope = scopeId; dragBulletIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', 'bullet-' + scopeId + '-' + idx);
+  setTimeout(function(){ e.target.closest('.bullet-row').classList.add('bullet-dragging'); }, 0);
+  e.stopPropagation();
+}
+function bulletDragEnd(e) {
+  dragBulletScope = null; dragBulletIdx = null;
+  document.querySelectorAll('.bullet-row').forEach(function(el) { el.classList.remove('bullet-dragging','bullet-drag-over-top','bullet-drag-over-bottom'); });
+}
+function bulletDragOver(e, scopeId, idx) {
+  if(dragBulletScope === null || dragBulletScope !== scopeId) return;
+  e.preventDefault(); e.stopPropagation();
+  e.dataTransfer.dropEffect = 'move';
+  var rect = e.currentTarget.getBoundingClientRect();
+  var mid = rect.top + rect.height / 2;
+  e.currentTarget.classList.remove('bullet-drag-over-top','bullet-drag-over-bottom');
+  e.currentTarget.classList.add(e.clientY < mid ? 'bullet-drag-over-top' : 'bullet-drag-over-bottom');
+}
+function bulletDragLeave(e) {
+  e.currentTarget.classList.remove('bullet-drag-over-top','bullet-drag-over-bottom');
+}
+function bulletDrop(e, scopeId, targetIdx) {
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.remove('bullet-drag-over-top','bullet-drag-over-bottom');
+  if(dragBulletScope !== scopeId || dragBulletIdx === null || dragBulletIdx === targetIdx) return;
+  var s = scopes.find(function(s) { return s.id === scopeId; });
+  if(!s) return;
+  var rect = e.currentTarget.getBoundingClientRect();
+  var mid = rect.top + rect.height / 2;
+  var item = s.bullets.splice(dragBulletIdx, 1)[0];
+  var insertIdx = targetIdx;
+  if(dragBulletIdx < targetIdx) insertIdx--;
+  if(e.clientY >= mid) insertIdx++;
+  s.bullets.splice(insertIdx, 0, item);
+  dragBulletScope = null; dragBulletIdx = null;
+  renderScopeCards(); up();
+}
+
+// ── BOLD / ITALIC FORMATTING ─────────────────────────────────────────────────
+function insertFmt(scopeId, idx, type) {
+  var ta = document.getElementById('bt-' + scopeId + '-' + idx);
+  if(!ta) return;
+  var start = ta.selectionStart, end = ta.selectionEnd;
+  var text = ta.value;
+  var marker = type === 'bold' ? '**' : '*';
+  var sel = text.substring(start, end);
+  // If selection is already wrapped, unwrap it
+  var before = text.substring(0, start), after = text.substring(end);
+  if(before.endsWith(marker) && after.startsWith(marker)) {
+    ta.value = before.slice(0, -marker.length) + sel + after.slice(marker.length);
+    ta.selectionStart = start - marker.length;
+    ta.selectionEnd = end - marker.length;
+  } else {
+    ta.value = before + marker + sel + marker + after;
+    ta.selectionStart = start + marker.length;
+    ta.selectionEnd = end + marker.length;
+  }
+  var s = scopes.find(function(s) { return s.id === scopeId; });
+  if(s) s.bullets[idx] = ta.value;
+  ta.focus();
+  up();
 }
 
 function handlePhotos(inp) {
@@ -1114,9 +1258,19 @@ function renderTOC() {
   }).join('');
 }
 
+function fmtBullet(raw) {
+  // Convert **bold** and *italic* to HTML (escape first, then convert markers)
+  var t = esc(raw);
+  // Bold: **text**
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Italic: *text*
+  t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  return t;
+}
+
 function renderScopePages() {
   document.getElementById('scope-pages').innerHTML = scopes.filter(function(s) { return s.enabled; }).map(function(s) {
-    var bullets = s.bullets.filter(function(b) { return b.trim(); }).map(function(b) { return '<li>' + esc(b) + '</li>'; }).join('');
+    var bullets = s.bullets.filter(function(b) { return b.trim(); }).map(function(b) { return '<li>' + fmtBullet(b) + '</li>'; }).join('');
     var imgHtml = '';
     if(s.showImg !== false) {
       var fitClass = s.imgFit === 'cover' ? ' fit-cover' : '';
