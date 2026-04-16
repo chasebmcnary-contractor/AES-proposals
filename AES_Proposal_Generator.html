@@ -51,10 +51,10 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .sc-drag:hover{color:var(--blue);}
 .sc-hdr input[type=checkbox]{width:14px;height:14px;accent-color:var(--blue);flex-shrink:0;}
 .sc-name{font-weight:600;font-size:12px;flex:1;}
-.sc-btns{display:flex;gap:4px;margin-left:auto;}
-.sc-edit{background:none;border:none;font-size:13px;cursor:pointer;color:#aaa;padding:2px 4px;}
+.sc-btns{display:flex;gap:12px;margin-left:auto;}
+.sc-edit{background:none;border:none;font-size:14px;cursor:pointer;color:#aaa;padding:4px 6px;}
 .sc-edit:hover{color:var(--blue);}
-.sc-del{background:none;border:none;font-size:17px;cursor:pointer;color:#ddd;padding:1px 4px;}
+.sc-del{background:none;border:none;font-size:14px;cursor:pointer;color:#ccc;padding:4px 6px;}
 .sc-del:hover{color:var(--red);}
 .sc-body{padding:11px;border-top:1px solid #eee;display:none;}
 .sc-body.open{display:block;}
@@ -180,6 +180,7 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .scope-box ul li::before{content:'▪';position:absolute;left:0;color:var(--red);font-size:9px;top:7px;}
 .scope-box ul li strong{font-weight:700;color:var(--dark);}
 .scope-box ul li em{font-style:italic;}
+.scope-comments{background:#fff;border-left:3px solid var(--blue);padding:10px 14px;border-radius:0 4px 4px 0;font-size:12.5px;color:var(--dark);line-height:1.6;margin-bottom:12px;font-weight:700;}
 .scope-notes{background:#fff;border-left:3px solid var(--mid);padding:10px 14px;border-radius:0 4px 4px 0;font-size:12.5px;color:#555;line-height:1.6;margin-top:14px;}
 .scope-img-area{border:2px dashed #ccc;border-radius:4px;overflow:hidden;height:320px;display:flex;align-items:center;justify-content:center;background:var(--gray);}
 .scope-img-area img{width:100%;height:100%;object-fit:contain;background:var(--gray);}
@@ -399,10 +400,6 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
         <div class="field"><label>Bid Date</label><input id="f-date" type="date" oninput="up()"></div>
       </div>
       <div class="field"><label>Property Address</label><input id="f-addr" type="text" placeholder="501 E Willetta St, Phoenix, AZ 85004" oninput="up()"></div>
-      <div class="frow">
-        <div class="field"><label>Buildings</label><input id="f-bldgs" type="text" placeholder="42" oninput="up()"></div>
-        <div class="field"><label>Total Units</label><input id="f-units" type="text" placeholder="236" oninput="up()"></div>
-      </div>
       <div class="frow">
         <div class="field"><label>Estimator</label><input id="f-est" type="text" value="Chase McNary" oninput="up()"></div>
         <div class="field"><label>Estimator Phone</label><input id="f-est-phone" type="text" placeholder="(555) 555-5555" oninput="up()"></div>
@@ -888,7 +885,8 @@ function addScope(data) {
     images: (data && data.images) ? data.images : [],
     showImg: (data && data.showImg === false) ? false : true,
     imgFit: (data && data.imgFit) ? data.imgFit : 'contain',
-    bullets: (data && data.bullets) ? data.bullets : ['']
+    bullets: (data && data.bullets) ? data.bullets : [''],
+    additionalComments: (data && data.additionalComments) ? data.additionalComments : ''
   });
   renderScopeCards();
   up();
@@ -915,6 +913,10 @@ function setScopeTitle(id, val) {
 function setScopeNotes(id, val) {
   var s = scopes.find(function(s) { return s.id === id; });
   if(s) { s.notes = val; up(); }
+}
+function setScopeComments(id, val) {
+  var s = scopes.find(function(s) { return s.id === id; });
+  if(s) { s.additionalComments = val; up(); }
 }
 function addBullet(id) {
   var s = scopes.find(function(s) { return s.id === id; });
@@ -974,6 +976,12 @@ function setScopeImgFit(id, val) {
 }
 
 function renderScopeCards() {
+  // Preserve which scope bodies are currently expanded before re-rendering
+  var openScopes = {};
+  document.querySelectorAll('.sc-body.open').forEach(function(el) {
+    var idMatch = el.id.match(/^scb-(\d+)$/);
+    if(idMatch) openScopes[idMatch[1]] = true;
+  });
   document.getElementById('sc-list').innerHTML = scopes.map(function(s) {
     var bullets = s.bullets.map(function(b, i) {
       return '<div class="bullet-row" draggable="true" ondragstart="bulletDragStart(event,' + s.id + ',' + i + ')" ondragend="bulletDragEnd(event)" ondragover="bulletDragOver(event,' + s.id + ',' + i + ')" ondragleave="bulletDragLeave(event)" ondrop="bulletDrop(event,' + s.id + ',' + i + ')">' +
@@ -1003,8 +1011,11 @@ function renderScopeCards() {
           '<button class="sc-del" onclick="removeScope(' + s.id + ')">&#215;</button>' +
         '</div>' +
       '</div>' +
-      '<div class="sc-body" id="scb-' + s.id + '">' +
+      '<div class="sc-body' + (openScopes[s.id] ? ' open' : '') + '" id="scb-' + s.id + '">' +
         '<div class="field"><label>Title</label><input type="text" value="' + esc(s.title) + '" oninput="setScopeTitle(' + s.id + ',this.value)"></div>' +
+        '<div class="field" style="margin-top:10px;"><label>Additional Comments (optional — bold on proposal)</label>' +
+          '<textarea placeholder="Scope overview or additional comments... (only appears on proposal if filled out)" oninput="setScopeComments(' + s.id + ',this.value)">' + esc(s.additionalComments) + '</textarea>' +
+        '</div>' +
         '<div class="field"><label>Bullet Points</label></div>' +
         '<div class="bullet-list" id="bl-' + s.id + '">' + bullets + '</div>' +
         '<button class="add-bullet" onclick="addBullet(' + s.id + ')">+ Add Bullet</button>' +
@@ -1301,6 +1312,7 @@ function renderScopePages() {
         '<div class="section-title">' + esc(s.title) + '</div>' +
         '<div class="scope-box">' +
           '<h4>Scope Details</h4>' +
+          (s.additionalComments ? '<div class="scope-comments">' + esc(s.additionalComments) + '</div>' : '') +
           '<ul>' + (bullets || '<li>No items added yet</li>') + '</ul>' +
           (s.notes ? '<div class="scope-notes">' + esc(s.notes) + '</div>' : '') +
         '</div>' +
