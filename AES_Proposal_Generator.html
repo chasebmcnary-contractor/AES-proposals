@@ -182,6 +182,19 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .scope-box ul li em{font-style:italic;}
 .scope-comments{background:#fff;border-left:3px solid var(--blue);padding:10px 14px;border-radius:0 4px 4px 0;font-size:12.5px;color:var(--dark);line-height:1.6;margin-bottom:12px;font-weight:700;white-space:pre-wrap;}
 .scope-notes{background:#fff;border-left:3px solid var(--mid);padding:10px 14px;border-radius:0 4px 4px 0;font-size:12.5px;color:#555;line-height:1.6;margin-top:14px;white-space:pre-wrap;}
+.rate-schedule{margin-top:16px;}
+.rate-schedule h4{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--blue);margin:0 0 4px;}
+.rate-note{font-size:11px;color:#666;margin:0 0 8px;font-style:italic;line-height:1.5;}
+.rate-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.rate-table th{background:var(--blue);color:#fff;text-align:left;padding:6px 10px;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;}
+.rate-table th:last-child,.rate-table td:last-child{text-align:right;white-space:nowrap;}
+.rate-table td{border:1px solid #e2e2e2;padding:6px 10px;color:#333;}
+.rate-table tbody tr:nth-child(even){background:#f7f8fa;}
+.rate-row{display:flex;gap:6px;margin-bottom:6px;}
+.rate-row input{flex:1;font-size:11px;padding:5px 7px;border:1px solid #ddd;border-radius:3px;}
+.rate-row input.rate-unit{max-width:120px;}
+.rate-row input.rate-amt{max-width:110px;}
+.rate-row button{border:none;background:#eee;border-radius:3px;cursor:pointer;padding:0 9px;font-size:13px;}
 .scope-img-area{border:2px dashed #ccc;border-radius:4px;overflow:hidden;height:320px;display:flex;align-items:center;justify-content:center;background:var(--gray);}
 .scope-img-area img{width:100%;height:100%;object-fit:contain;background:var(--gray);}
 .scope-img-area.fit-cover img{object-fit:cover;}
@@ -951,7 +964,8 @@ function addScope(data) {
     showImg: (data && data.showImg === false) ? false : true,
     imgFit: (data && data.imgFit) ? data.imgFit : 'contain',
     bullets: (data && data.bullets) ? data.bullets : [''],
-    additionalComments: (data && data.additionalComments) ? data.additionalComments : ''
+    additionalComments: (data && data.additionalComments) ? data.additionalComments : '',
+    rates: (data && data.rates) ? data.rates : []
   });
   renderScopeCards();
   up();
@@ -994,6 +1008,18 @@ function setBullet(id, i, val) {
 function removeBullet(id, i) {
   var s = scopes.find(function(s) { return s.id === id; });
   if(s && s.bullets.length > 1) { s.bullets.splice(i, 1); renderScopeCards(); up(); }
+}
+function addRate(id) {
+  var s = scopes.find(function(s) { return s.id === id; });
+  if(s) { if(!s.rates) s.rates = []; s.rates.push({ component:'', unit:'', rate:'' }); renderScopeCards(); up(); }
+}
+function setRate(id, i, field, val) {
+  var s = scopes.find(function(s) { return s.id === id; });
+  if(s && s.rates && s.rates[i]) { s.rates[i][field] = val; up(); }
+}
+function removeRate(id, i) {
+  var s = scopes.find(function(s) { return s.id === id; });
+  if(s && s.rates) { s.rates.splice(i, 1); renderScopeCards(); up(); }
 }
 function compressImage(file, maxW, maxH, quality, cb) {
   var r = new FileReader();
@@ -1087,6 +1113,18 @@ function renderScopeCards() {
         '<div class="field" style="margin-top:10px;"><label>Additional Notes (optional)</label>' +
           '<textarea placeholder="Extra context..." oninput="setScopeNotes(' + s.id + ',this.value)">' + esc(s.notes) + '</textarea>' +
         '</div>' +
+        '<div class="field" style="margin-top:10px;"><label>Change-Order Unit Rate Schedule (optional)</label></div>' +
+        '<div class="rate-edit" id="re-' + s.id + '">' +
+          (s.rates || []).map(function(r, i) {
+            return '<div class="rate-row">' +
+              '<input type="text" placeholder="Component (e.g. 1x6 Decorative)" value="' + esc(r.component || '') + '" oninput="setRate(' + s.id + ',' + i + ',\'component\',this.value)">' +
+              '<input type="text" class="rate-unit" placeholder="Unit (LF / EA / Location)" value="' + esc(r.unit || '') + '" oninput="setRate(' + s.id + ',' + i + ',\'unit\',this.value)">' +
+              '<input type="text" class="rate-amt" placeholder="Rate ($)" value="' + esc(r.rate || '') + '" oninput="setRate(' + s.id + ',' + i + ',\'rate\',this.value)">' +
+              '<button onclick="removeRate(' + s.id + ',' + i + ')">&#215;</button>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        '<button class="add-bullet" onclick="addRate(' + s.id + ')">+ Add Rate Row</button>' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 4px;">' +
           '<label style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--mid);">Image on Page</label>' +
           '<label class="pv-switch"><input type="checkbox" ' + (s.showImg ? 'checked' : '') + ' onchange="toggleScopeImg(' + s.id + ',this.checked)"><span class="pv-slider"></span></label>' +
@@ -1379,6 +1417,19 @@ function fmtBullet(raw) {
 function renderScopePages() {
   document.getElementById('scope-pages').innerHTML = scopes.filter(function(s) { return s.enabled; }).map(function(s) {
     var bullets = s.bullets.filter(function(b) { return b.trim(); }).map(function(b) { return '<li>' + fmtBullet(b) + '</li>'; }).join('');
+    var rateRows = (s.rates || []).filter(function(r) { return (r.component || '').trim() || (r.unit || '').trim() || (r.rate || '').trim(); });
+    var rateHtml = '';
+    if(rateRows.length) {
+      rateHtml = '<div class="rate-schedule">' +
+        '<h4>Change-Order Unit Rate Schedule</h4>' +
+        '<p class="rate-note">Additional or concealed repairs discovered beyond the quantities above are billed at the unit rates below, by owner-approved change order.</p>' +
+        '<table class="rate-table"><thead><tr><th>Component</th><th>Unit</th><th>Unit Rate</th></tr></thead><tbody>' +
+        rateRows.map(function(r) {
+          return '<tr><td>' + esc(r.component || '') + '</td><td>' + esc(r.unit || '') + '</td><td>' + esc(r.rate || '') + '</td></tr>';
+        }).join('') +
+        '</tbody></table>' +
+      '</div>';
+    }
     var imgHtml = '';
     if(s.showImg !== false) {
       var fitClass = s.imgFit === 'cover' ? ' fit-cover' : '';
@@ -1403,6 +1454,7 @@ function renderScopePages() {
           (s.additionalComments ? '<div class="scope-comments">' + esc(s.additionalComments) + '</div>' : '') +
           '<ul>' + (bullets || '<li>No items added yet</li>') + '</ul>' +
           (s.notes ? '<div class="scope-notes">' + esc(s.notes) + '</div>' : '') +
+          rateHtml +
         '</div>' +
         imgHtml +
       '</div>' +
