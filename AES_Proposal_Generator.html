@@ -965,7 +965,9 @@ function addScope(data) {
     imgFit: (data && data.imgFit) ? data.imgFit : 'contain',
     bullets: (data && data.bullets) ? data.bullets : [''],
     additionalComments: (data && data.additionalComments) ? data.additionalComments : '',
-    rates: (data && data.rates) ? data.rates : []
+    rates: (data && data.rates) ? data.rates : [],
+    rateTitle: (data && data.rateTitle) ? data.rateTitle : '',
+    rateNote: (data && data.rateNote) ? data.rateNote : ''
   });
   renderScopeCards();
   up();
@@ -1020,6 +1022,14 @@ function setRate(id, i, field, val) {
 function removeRate(id, i) {
   var s = scopes.find(function(s) { return s.id === id; });
   if(s && s.rates) { s.rates.splice(i, 1); renderScopeCards(); up(); }
+}
+function setRateTitle(id, val) {
+  var s = scopes.find(function(s) { return s.id === id; });
+  if(s) { s.rateTitle = val; up(); }
+}
+function setRateNote(id, val) {
+  var s = scopes.find(function(s) { return s.id === id; });
+  if(s) { s.rateNote = val; up(); }
 }
 function compressImage(file, maxW, maxH, quality, cb) {
   var r = new FileReader();
@@ -1114,6 +1124,8 @@ function renderScopeCards() {
           '<textarea placeholder="Extra context..." oninput="setScopeNotes(' + s.id + ',this.value)">' + esc(s.notes) + '</textarea>' +
         '</div>' +
         '<div class="field" style="margin-top:10px;"><label>Change-Order Unit Rate Schedule (optional)</label></div>' +
+        '<div class="field"><input type="text" placeholder="Schedule heading (blank = &quot;Change-Order Unit Rate Schedule&quot;)" value="' + esc(s.rateTitle || '') + '" oninput="setRateTitle(' + s.id + ',this.value)"></div>' +
+        '<div class="field" style="margin-top:6px;"><textarea placeholder="Schedule note / description (blank = default wording)" oninput="setRateNote(' + s.id + ',this.value)">' + esc(s.rateNote || '') + '</textarea></div>' +
         '<div class="rate-edit" id="re-' + s.id + '">' +
           (s.rates || []).map(function(r, i) {
             return '<div class="rate-row">' +
@@ -1420,9 +1432,11 @@ function renderScopePages() {
     var rateRows = (s.rates || []).filter(function(r) { return (r.component || '').trim() || (r.unit || '').trim() || (r.rate || '').trim(); });
     var rateHtml = '';
     if(rateRows.length) {
+      var rateTitle = (s.rateTitle || '').trim() || 'Change-Order Unit Rate Schedule';
+      var rateNote  = (s.rateNote  || '').trim() || 'Additional or concealed repairs discovered beyond the quantities above are billed at the unit rates below, by owner-approved change order.';
       rateHtml = '<div class="rate-schedule">' +
-        '<h4>Change-Order Unit Rate Schedule</h4>' +
-        '<p class="rate-note">Additional or concealed repairs discovered beyond the quantities above are billed at the unit rates below, by owner-approved change order.</p>' +
+        '<h4>' + esc(rateTitle) + '</h4>' +
+        (rateNote ? '<p class="rate-note">' + esc(rateNote) + '</p>' : '') +
         '<table class="rate-table"><thead><tr><th>Component</th><th>Unit</th><th>Unit Rate</th></tr></thead><tbody>' +
         rateRows.map(function(r) {
           return '<tr><td>' + esc(r.component || '') + '</td><td>' + esc(r.unit || '') + '</td><td>' + esc(r.rate || '') + '</td></tr>';
