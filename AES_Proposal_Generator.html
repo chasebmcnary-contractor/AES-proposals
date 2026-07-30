@@ -399,16 +399,26 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
   .scope-img-area.three-imgs img{height:155px;}
   .scope-img-area.four-imgs img{height:140px;}
 }
+
+/* DRAG & DROP LOAD OVERLAY */
+#drop-overlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(0,48,135,.82);pointer-events:none;}
+#drop-overlay.show{display:flex;}
+#drop-overlay .drop-box{border:3px dashed rgba(255,255,255,.85);border-radius:10px;padding:44px 64px;text-align:center;color:#fff;font-family:'Barlow Condensed',sans-serif;}
+#drop-overlay .drop-box .drop-icon{font-size:44px;margin-bottom:10px;}
+#drop-overlay .drop-box .drop-title{font-size:26px;font-weight:800;letter-spacing:2px;text-transform:uppercase;}
+#drop-overlay .drop-box .drop-sub{font-size:14px;opacity:.8;margin-top:6px;font-family:'Barlow',sans-serif;}
 </style>
 </head>
 <body>
+
+<div id="drop-overlay"><div class="drop-box"><div class="drop-icon">&#128194;</div><div class="drop-title">Drop to Load Proposal</div><div class="drop-sub">Release to open this .aes proposal file</div></div></div>
 
 <div class="app-bar">
   <img src="data:image/jpeg;base64,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" style="height:34px;width:auto;" alt="AES">
   <h1>AES <span>Proposal</span> Generator</h1>
   <div class="bar-actions">
     <button class="btn btn-ghost" onclick="resetAll()">&#8635; Reset</button>
-    <button class="btn btn-ghost" onclick="loadProposal()">&#128194; Load</button>
+    <button class="btn btn-ghost" onclick="loadProposal()" title="Click to browse, or drag &amp; drop a .aes file anywhere on the page">&#128194; Load</button>
     <button class="btn btn-ghost" onclick="saveProposal()">&#128190; Save</button>
     <button class="btn btn-red" onclick="window.print()">&#8595; Download PDF</button>
   </div>
@@ -1837,6 +1847,53 @@ function saveProposal() {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// ── DRAG & DROP LOADING ──────────────────────────────────────────────────────
+// Drop a .aes / .json proposal file anywhere on the page to load it.
+(function() {
+  var depth = 0;
+  function isFileDrag(e) {
+    return e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') !== -1;
+  }
+  function overlay() { return document.getElementById('drop-overlay'); }
+  document.addEventListener('dragenter', function(e) {
+    if(!isFileDrag(e)) return;
+    e.preventDefault();
+    depth++;
+    overlay().classList.add('show');
+  });
+  document.addEventListener('dragover', function(e) {
+    if(!isFileDrag(e)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+  document.addEventListener('dragleave', function(e) {
+    if(!isFileDrag(e)) return;
+    depth = Math.max(0, depth - 1);
+    if(depth === 0) overlay().classList.remove('show');
+  });
+  document.addEventListener('drop', function(e) {
+    if(!isFileDrag(e)) return;
+    e.preventDefault();
+    depth = 0;
+    overlay().classList.remove('show');
+    var file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(!file) return;
+    if(!/\.(aes|json)$/i.test(file.name)) {
+      alert('Drop a .aes proposal file to load it. (Got: ' + file.name + ')\n\nTo add photos to a scope, use the upload box inside that scope card.');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        restoreProposal(JSON.parse(evt.target.result));
+      } catch(err) {
+        alert('Could not load file — make sure it is a valid AES proposal file.\n\n' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  });
+})();
 
 function loadProposal() {
   var inp = document.createElement('input');
