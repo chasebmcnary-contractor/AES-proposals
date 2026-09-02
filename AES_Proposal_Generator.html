@@ -373,6 +373,11 @@ body{font-family:'Barlow',sans-serif;background:#dedede;color:var(--dark);}
 .why-col ul{list-style:none;border:1px solid #e0e0e0;border-top:none;border-radius:0 0 3px 3px;overflow:hidden;}
 .why-col ul li{font-size:12px;padding:7px 12px 7px 28px;position:relative;border-bottom:1px solid #f0f0f0;color:#333;line-height:1.4;}
 .why-col ul li:last-child{border-bottom:none;}
+.why-cols{align-items:stretch;}
+.why-col{display:flex;flex-direction:column;}
+.why-col ul{flex:1 1 auto;display:flex;flex-direction:column;margin-bottom:0;}
+.why-col ul li{flex:1 1 0;display:flex;align-items:center;}
+.why-col ul li .li-body{display:block;width:100%;}
 .why-col ul li::before{content:'✓';position:absolute;left:10px;color:var(--blue);font-weight:700;font-size:11px;top:8px;}
 .why-col.red ul li::before{color:var(--dark);}
 .about-divider{height:3px;background:linear-gradient(to right,var(--blue),var(--red));margin:12px 0 14px;}
@@ -697,32 +702,30 @@ Any additional work not explicitly listed above</textarea>
   </div>
   <div class="about-content">
     <div class="section-title">Why AES</div>
-    <div class="why-tagline">One contractor. Every surface.</div>
-    <p class="why-intro">AES specializes in large-scale commercial and multifamily exterior renovations — managed under one contract, one team, one point of contact. No subcontractor confusion. No surprise change orders.</p>
+    <div class="why-tagline">Roof. Paint. Repair.</div>
+    <p class="why-intro">AES is a licensed general contractor built for large-scale multifamily and commercial exteriors. Roofing, coatings, and repairs run under one contract, one project manager, and one warranty. Owners get a single number to call and a single company standing behind the finished building.</p>
     <div class="why-cols">
       <div class="why-col">
         <h4>What We Do</h4>
         <ul>
-          <li>Protective Coatings &amp; Painting</li>
-          <li>Full Roofing Services</li>
-          <li>Stucco Repair &amp; Application</li>
-          <li>Siding Installation &amp; Repair</li>
-          <li>Wood Repair &amp; Replacement</li>
-          <li>Metal &amp; Structural Repairs</li>
-          <li>General Contracting</li>
-        </ul>
+<li><span class="li-body"><strong>ROOF</strong> — Replacement, repair, restoration coatings, and inspections across all commercial roof systems</span></li>
+<li><span class="li-body"><strong>PAINT</strong> — Exterior repaints and protective coating systems applied to manufacturer specification</span></li>
+<li><span class="li-body"><strong>REPAIR</strong> — Stucco, siding, wood, metal, and structural repairs</span></li>
+<li><span class="li-body"><strong>Licensed KB-1 General Contractor</strong> — the license that lets all three run under one contract</span></li>
+<li><span class="li-body">Balcony, deck, and waterproofing systems</span></li>
+<li><span class="li-body">Full exterior envelope restoration</span></li>
+</ul>
       </div>
       <div class="why-col red">
         <h4>How We Do It</h4>
         <ul>
-          <li>Licensed KB-1 General Contractor</li>
-          <li>In-house project management &amp; quality control</li>
-          <li>OSHA-compliant crews &amp; safety oversight</li>
-          <li>Detailed scopes that eliminate change orders</li>
-          <li>Proven resident communication systems</li>
-          <li>Fully bonded &amp; insured</li>
-          <li>Single point of contact from bid to completion</li>
-        </ul>
+<li><span class="li-body">One project manager and one point of contact from bid through closeout</span></li>
+<li><span class="li-body">Photo documented scopes, so change orders are the exception and never the business model</span></li>
+<li><span class="li-body">In-house quality control with building by building sign-off</span></li>
+<li><span class="li-body">Manufacturer specified systems with rep involvement on the roof and the paint</span></li>
+<li><span class="li-body">OSHA compliant crews under direct AES supervision, fully bonded and insured</span></li>
+<li><span class="li-body">Resident communication handled for you: phased notices, door hangers, and daily coordination with your on-site team</span></li>
+</ul>
       </div>
     </div>
     <div class="about-divider"></div>
